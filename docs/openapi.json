@@ -1,0 +1,456 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "FinalProject2 API",
+    "version": "1.0.0",
+    "description": "Gin REST API with JWT and PostgreSQL"
+  },
+  "servers": [
+    { "url": "http://localhost:8080" }
+  ],
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+    },
+    "schemas": {
+      "ErrorData": {
+        "type": "object",
+        "properties": {
+          "message": { "type": "string" },
+          "status": { "type": "integer" },
+          "error": { "type": "string" }
+        }
+      },
+      "NewUserRequest": {
+        "type": "object",
+        "required": ["age", "email", "password", "username"],
+        "properties": {
+          "age": { "type": "integer", "minimum": 9 },
+          "email": { "type": "string", "format": "email" },
+          "password": { "type": "string", "minLength": 6 },
+          "username": { "type": "string" }
+        }
+      },
+      "NewUserResponse": {
+        "type": "object",
+        "properties": {
+          "age": { "type": "integer" },
+          "email": { "type": "string" },
+          "id": { "type": "integer" },
+          "username": { "type": "string" }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": ["email", "password"],
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string" }
+        }
+      },
+      "LoginResponse": {
+        "type": "object",
+        "properties": { "token": { "type": "string" } }
+      },
+      "UpdateUserRequest": {
+        "type": "object",
+        "required": ["email", "username"],
+        "properties": {
+          "email": { "type": "string", "format": "email" },
+          "username": { "type": "string" }
+        }
+      },
+      "UpdateUserResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "email": { "type": "string" },
+          "username": { "type": "string" },
+          "age": { "type": "integer" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "DeleteUserResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+
+      "NewPhotoRequest": {
+        "type": "object",
+        "required": ["title", "photo_url"],
+        "properties": {
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" }
+        }
+      },
+      "NewPhotoResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "GetUsersPhoto": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "username": { "type": "string" }
+        }
+      },
+      "GetPhotosWithUser": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "user": { "$ref": "#/components/schemas/GetUsersPhoto" }
+        }
+      },
+      "GetPhotosResponse": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/GetPhotosWithUser" } } }
+      },
+      "UpdatePhotoRequest": {
+        "type": "object",
+        "properties": {
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" }
+        }
+      },
+      "UpdatePhotoResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "DeletePhotoResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+
+      "NewCommentRequest": {
+        "type": "object",
+        "required": ["message", "photo_id"],
+        "properties": {
+          "message": { "type": "string" },
+          "photo_id": { "type": "integer" }
+        }
+      },
+      "NewCommentResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "message": { "type": "string" },
+          "photo_id": { "type": "integer" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "GetPhotosComment": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" },
+          "user_id": { "type": "integer" }
+        }
+      },
+      "GetUsersComment": {
+        "type": "object",
+        "properties": {
+          "email": { "type": "string" },
+          "id": { "type": "integer" },
+          "username": { "type": "string" }
+        }
+      },
+      "GetCommentsWithUserAndPhoto": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "message": { "type": "string" },
+          "photo_id": { "type": "integer" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "user": { "$ref": "#/components/schemas/GetUsersComment" },
+          "photo": { "$ref": "#/components/schemas/GetPhotosComment" }
+        }
+      },
+      "UpdateCommentRequest": {
+        "type": "object",
+        "required": ["message"],
+        "properties": { "message": { "type": "string" } }
+      },
+      "UpdateCommentResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "caption": { "type": "string" },
+          "photo_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "DeleteCommentResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      },
+
+      "NewSocialMediaRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "social_media_url": { "type": "string" }
+        }
+      },
+      "NewSocialMediaResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "social_media_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "GetUsersSocialMedia": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "username": { "type": "string" },
+          "profil_image_url": { "type": "string" }
+        }
+      },
+      "GetSocialMediaWithUser": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "social_media_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "user": { "$ref": "#/components/schemas/GetUsersSocialMedia" }
+        }
+      },
+      "GetSocialMediaResponse": {
+        "type": "object",
+        "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/GetSocialMediaWithUser" } } }
+      },
+      "UpdateSocialMediaRequest": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "social_media_url": { "type": "string" }
+        }
+      },
+      "UpdateSocialMediaResponse": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "social_media_url": { "type": "string" },
+          "user_id": { "type": "integer" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "DeleteSocialMediaResponse": {
+        "type": "object",
+        "properties": { "message": { "type": "string" } }
+      }
+    }
+  },
+  "paths": {
+    "/users/register": {
+      "post": {
+        "summary": "Register user",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewUserRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewUserResponse" } } } },
+          "422": { "description": "Invalid JSON", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorData" } } } }
+        }
+      }
+    },
+    "/users/login": {
+      "post": {
+        "summary": "Login user",
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginResponse" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorData" } } } }
+        }
+      }
+    },
+    "/users": {
+      "put": {
+        "summary": "Update user",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateUserRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateUserResponse" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorData" } } } }
+        }
+      },
+      "delete": {
+        "summary": "Delete user",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteUserResponse" } } } },
+          "401": { "description": "Unauthorized", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorData" } } } }
+        }
+      }
+    },
+    "/photos": {
+      "post": {
+        "summary": "Create photo",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewPhotoRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewPhotoResponse" } } } }
+        }
+      },
+      "get": {
+        "summary": "Get photos",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GetPhotosResponse" } } } }
+        }
+      }
+    },
+    "/photos/{photoId}": {
+      "put": {
+        "summary": "Update photo",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "photoId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePhotoRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdatePhotoResponse" } } } }
+        }
+      },
+      "delete": {
+        "summary": "Delete photo",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "photoId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeletePhotoResponse" } } } }
+        }
+      }
+    },
+    "/comments": {
+      "post": {
+        "summary": "Create comment",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewCommentRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewCommentResponse" } } } }
+        }
+      },
+      "get": {
+        "summary": "Get comments",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/GetCommentsWithUserAndPhoto" } } } } }
+        }
+      }
+    },
+    "/comments/{commentId}": {
+      "put": {
+        "summary": "Update comment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "commentId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateCommentRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateCommentResponse" } } } }
+        }
+      },
+      "delete": {
+        "summary": "Delete comment",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "commentId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteCommentResponse" } } } }
+        }
+      }
+    },
+    "/socialmedias": {
+      "post": {
+        "summary": "Create social media",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewSocialMediaRequest" } } }
+        },
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewSocialMediaResponse" } } } }
+        }
+      },
+      "get": {
+        "summary": "Get social medias",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GetSocialMediaResponse" } } } }
+        }
+      }
+    },
+    "/socialmedias/{socialMediaId}": {
+      "put": {
+        "summary": "Update social media",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "socialMediaId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "requestBody": {
+          "required": true,
+          "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateSocialMediaRequest" } } }
+        },
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateSocialMediaResponse" } } } }
+        }
+      },
+      "delete": {
+        "summary": "Delete social media",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [ { "name": "socialMediaId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteSocialMediaResponse" } } } }
+        }
+      }
+    }
+  }
+}

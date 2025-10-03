@@ -1,0 +1,257 @@
+{
+  "info": {
+    "name": "FinalProject2 API",
+    "description": "Postman collection untuk API FinalProject2 (Gin + JWT + PostgreSQL)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"age\": 21,\n  \"email\": \"john@example.com\",\n  \"password\": \"secret123\",\n  \"username\": \"john\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john@example.com\",\n  \"password\": \"secret123\"\n}"
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "try {",
+                  "  const jsonData = pm.response.json();",
+                  "  if (jsonData && jsonData.token) {",
+                  "    pm.collectionVariables.set('token', jsonData.token);",
+                  "  }",
+                  "  pm.test('Token tersimpan', function () {",
+                  "    pm.expect(pm.collectionVariables.get('token')).to.be.a('string');",
+                  "  });",
+                  "} catch (e) {",
+                  "  console.warn('Tidak bisa parsing response JSON:', e);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Update User (PUT /users)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"john.new@example.com\",\n  \"username\": \"johnny\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete User (DELETE /users)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/users"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Photos",
+      "item": [
+        {
+          "name": "Create Photo (POST /photos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/photos",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My Photo\",\n  \"caption\": \"At the beach\",\n  \"photo_url\": \"https://example.com/photo.jpg\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Photos (GET /photos)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/photos"
+          }
+        },
+        {
+          "name": "Update Photo (PUT /photos/:photoId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/photos/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"My Photo (updated)\",\n  \"caption\": \"Sunset\",\n  \"photo_url\": \"https://example.com/photo-updated.jpg\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Photo (DELETE /photos/:photoId)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/photos/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Comments",
+      "item": [
+        {
+          "name": "Create Comment (POST /comments)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/comments",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Nice pic!\",\n  \"photo_id\": 1\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Comments (GET /comments)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/comments"
+          }
+        },
+        {
+          "name": "Update Comment (PUT /comments/:commentId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/comments/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"message\": \"Updated comment\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Comment (DELETE /comments/:commentId)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/comments/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "SocialMedias",
+      "item": [
+        {
+          "name": "Create Social Media (POST /socialmedias)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/socialmedias",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Instagram\",\n  \"social_media_url\": \"https://instagram.com/john\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Get Social Medias (GET /socialmedias)",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/socialmedias"
+          }
+        },
+        {
+          "name": "Update Social Media (PUT /socialmedias/:socialMediaId)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/socialmedias/1",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Instagram (updated)\",\n  \"social_media_url\": \"https://instagram.com/john-updated\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Social Media (DELETE /socialmedias/:socialMediaId)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" }
+            ],
+            "url": "{{baseUrl}}/socialmedias/1"
+          }
+        }
+      ]
+    }
+  ]
+}
