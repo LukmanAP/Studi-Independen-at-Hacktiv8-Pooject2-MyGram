@@ -277,10 +277,17 @@
       }
     }
   },
+  "tags": [
+    { "name": "Users", "description": "Endpoints untuk pengguna" },
+    { "name": "Photos", "description": "Endpoints untuk foto (Auth: Bearer JWT)" },
+    { "name": "Comments", "description": "Endpoints untuk komentar (Auth: Bearer JWT)" },
+    { "name": "Social Medias", "description": "Endpoints untuk sosial media (Auth: Bearer JWT)" }
+  ],
   "paths": {
     "/users/register": {
       "post": {
-        "summary": "Register user",
+        "tags": ["Users"],
+        "summary": "Register pengguna baru",
         "requestBody": {
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/NewUserRequest" } } }
@@ -293,7 +300,8 @@
     },
     "/users/login": {
       "post": {
-        "summary": "Login user",
+        "tags": ["Users"],
+        "summary": "Login dan mendapatkan JWT token",
         "requestBody": {
           "required": true,
           "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LoginRequest" } } }
@@ -306,7 +314,8 @@
     },
     "/users": {
       "put": {
-        "summary": "Update user",
+        "tags": ["Users"],
+        "summary": "Update data user (Auth)",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -318,7 +327,8 @@
         }
       },
       "delete": {
-        "summary": "Delete user",
+        "tags": ["Users"],
+        "summary": "Hapus akun user (Auth)",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/DeleteUserResponse" } } } },
@@ -328,7 +338,8 @@
     },
     "/photos": {
       "post": {
-        "summary": "Create photo",
+        "tags": ["Photos"],
+        "summary": "Buat foto baru",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -339,7 +350,8 @@
         }
       },
       "get": {
-        "summary": "Get photos",
+        "tags": ["Photos"],
+        "summary": "Ambil daftar foto (dengan info user)",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GetPhotosResponse" } } } }
@@ -348,7 +360,8 @@
     },
     "/photos/{photoId}": {
       "put": {
-        "summary": "Update photo",
+        "tags": ["Photos"],
+        "summary": "Update foto",
         "security": [{ "bearerAuth": [] }],
         "parameters": [ { "name": "photoId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
         "requestBody": {
@@ -360,7 +373,8 @@
         }
       },
       "delete": {
-        "summary": "Delete photo",
+        "tags": ["Photos"],
+        "summary": "Hapus foto",
         "security": [{ "bearerAuth": [] }],
         "parameters": [ { "name": "photoId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
         "responses": {
@@ -370,7 +384,8 @@
     },
     "/comments": {
       "post": {
-        "summary": "Create comment",
+        "tags": ["Comments"],
+        "summary": "Buat komentar (terkait photo)",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -381,7 +396,8 @@
         }
       },
       "get": {
-        "summary": "Get comments",
+        "tags": ["Comments"],
+        "summary": "Ambil komentar milik user (dengan info user & photo)",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/GetCommentsWithUserAndPhoto" } } } } }
@@ -390,7 +406,8 @@
     },
     "/comments/{commentId}": {
       "put": {
-        "summary": "Update comment",
+        "tags": ["Comments"],
+        "summary": "Update komentar",
         "security": [{ "bearerAuth": [] }],
         "parameters": [ { "name": "commentId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
         "requestBody": {
@@ -402,7 +419,8 @@
         }
       },
       "delete": {
-        "summary": "Delete comment",
+        "tags": ["Comments"],
+        "summary": "Hapus komentar",
         "security": [{ "bearerAuth": [] }],
         "parameters": [ { "name": "commentId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
         "responses": {
@@ -412,7 +430,8 @@
     },
     "/socialmedias": {
       "post": {
-        "summary": "Create social media",
+        "tags": ["Social Medias"],
+        "summary": "Buat social media",
         "security": [{ "bearerAuth": [] }],
         "requestBody": {
           "required": true,
@@ -423,7 +442,8 @@
         }
       },
       "get": {
-        "summary": "Get social medias",
+        "tags": ["Social Medias"],
+        "summary": "Ambil social medias milik user",
         "security": [{ "bearerAuth": [] }],
         "responses": {
           "201": { "description": "Created", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/GetSocialMediaResponse" } } } }
@@ -432,6 +452,7 @@
     },
     "/socialmedias/{socialMediaId}": {
       "put": {
+        "tags": ["Social Medias"],
         "summary": "Update social media",
         "security": [{ "bearerAuth": [] }],
         "parameters": [ { "name": "socialMediaId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
@@ -444,6 +465,7 @@
         }
       },
       "delete": {
+        "tags": ["Social Medias"],
         "summary": "Delete social media",
         "security": [{ "bearerAuth": [] }],
         "parameters": [ { "name": "socialMediaId", "in": "path", "required": true, "schema": { "type": "integer" } } ],
